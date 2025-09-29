@@ -1,34 +1,35 @@
-#!/usr/bin/env python3
-
 from app import app
-from models import db, Customer, Review, Item
+from models import db, Customer, Item, Review
 
+# Wrap DB operations in the app context
 with app.app_context():
+    # Drop and recreate tables
+    db.drop_all()
+    db.create_all()
 
-    Customer.query.delete()
-    Review.query.delete()
-    Item.query.delete()
+    # --- Customers ---
+    c1 = Customer(name="Tal Yuri")
+    c2 = Customer(name="Alice")
+    c3 = Customer(name="Bob")
 
-    customer1 = Customer(name='Tal Yuri')
-    customer2 = Customer(name='Raha Rosario')
-    customer3 = Customer(name='Luca Mahan')
-    db.session.add_all([customer1, customer2, customer3])
+    db.session.add_all([c1, c2, c3])
     db.session.commit()
 
-    item1 = Item(name='Laptop Backpack', price=49.99)
-    item2 = Item(name='Insulated Coffee Mug', price=9.99)
-    item3 = Item(name='6 Foot HDMI Cable', price=12.99)
-    db.session.add_all([item1, item2, item3])
+    # --- Items ---
+    i1 = Item(name="Laptop Backpack", price=49.99)
+    i2 = Item(name="Insulated Coffee Mug", price=9.99)
+    i3 = Item(name="Wireless Mouse", price=25.50)
+
+    db.session.add_all([i1, i2, i3])
     db.session.commit()
 
-    db.session.add(Review(comment="zipper broke the first week",
-                   customer=customer1, item=item1))
-    db.session.add(Review(comment="love this backpack!",
-                   customer=customer2, item=item1))
-    db.session.add(Review(comment="coffee stays hot for hours!",
-                   customer=customer1, item=item2))
-    db.session.add(Review(comment="best coffee mug ever!",
-                   customer=customer3, item=item2))
-    db.session.add(Review(comment="cable too short",
-                   customer=customer3, item=item3))
+    # --- Reviews ---
+    r1 = Review(comment="Love this backpack!", customer=c1, item=i1)
+    r2 = Review(comment="Mug keeps coffee hot for hours.", customer=c1, item=i2)
+    r3 = Review(comment="Mouse is smooth and fast.", customer=c2, item=i3)
+    r4 = Review(comment="Backpack straps could be thicker.", customer=c3, item=i1)
+
+    db.session.add_all([r1, r2, r3, r4])
     db.session.commit()
+
+    print("Database seeded successfully!")
